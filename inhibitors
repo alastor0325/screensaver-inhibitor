@@ -1,0 +1,37 @@
+#!/usr/bin/php
+<?php
+$list = `dbus-send --print-reply --dest=org.gnome.SessionManager /org/gnome/SessionManager org.gnome.SessionManager.GetInhibitors`;
+
+$l = explode("\n", $list);
+
+$found = false;
+foreach($l as $a)
+{
+	$a = trim($a);
+	if($found)
+	{
+		if($a == "]")
+		{
+			break;
+		}
+		if(substr($a, 0, 13) == 'object path "')
+		{
+			$inhibitor = substr($a, 13, strlen($a) - 14);
+
+			$info = `dbus-send --print-reply --dest=org.gnome.SessionManager $inhibitor org.gnome.SessionManager.Inhibitor.GetAppId`;
+
+			$names = explode("\n", $info);
+			$n = trim($names[1]);
+			if(substr($n, 0, 8) == 'string "')
+			{
+				$name = substr($n, 8, strlen($n) - 9);
+
+				echo $inhibitor, " ", $name, "\n";
+			}
+		}
+	}
+	elseif($a == "array [")
+	{
+		$found = true;
+	}
+}
