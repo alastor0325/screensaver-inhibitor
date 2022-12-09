@@ -1,7 +1,7 @@
 
 # Screensaver Inhibitor
 
-A PHP script to list the current screensaver inhibitors.
+A PHP script to list the current screensaver inhibitors on Linux.
 
 The script queries the D-Bus system for processes that are currently running and preventing your screensaver from kicking in.
 
@@ -21,9 +21,6 @@ The script queries the D-Bus system for processes that are currently running and
 
 * How to run
 
-    Run `$ inhibitor`
-    If there are active inhibitors, the script would show the requester and reason.
+    1. Run `$ ./inhibitor`
+    2. If there are active inhibitors, the script would show the requesters and the reason.
 
-## About Firefox
-
-Note that for Firefox you can just switch to another tab which doesn't require inhibition and it will drop out of the list. If you have multiple Firefox windows opened, then you may need to go to each one to fix them all. Other browsers may have the same feature. I didn't try. Such functionality is going to be on a per process. It's how these tools handle D-Bus and not how D-Bus works.
