@@ -1,37 +1,47 @@
 #!/usr/bin/php
 <?php
+
 $list = `dbus-send --print-reply --dest=org.gnome.SessionManager /org/gnome/SessionManager org.gnome.SessionManager.GetInhibitors`;
 
 $l = explode("\n", $list);
 
-$found = false;
+$foundResult = false;
+$foundInhibitor = false;
+
 foreach($l as $a)
 {
-	$a = trim($a);
-	if($found)
-	{
-		if($a == "]")
-		{
-			break;
-		}
-		if(substr($a, 0, 13) == 'object path "')
-		{
-			$inhibitor = substr($a, 13, strlen($a) - 14);
+    $a = trim($a);
+    if($foundResult)
+    {
+        if($a == "]")
+        {
+            if ($foundInhibitor == false) {
+                echo "No active inhibitor\n";
+            }
+            break;
+        }
+        if(substr($a, 0, 13) == 'object path "')
+        {
+            $foundInhibitor = true;
+            $inhibitor = substr($a, 13, strlen($a) - 14);
 
-			$info = `dbus-send --print-reply --dest=org.gnome.SessionManager $inhibitor org.gnome.SessionManager.Inhibitor.GetAppId`;
+            $AppId = `dbus-send --print-reply --dest=org.gnome.SessionManager $inhibitor org.gnome.SessionManager.Inhibitor.GetAppId`;
+            $InhibitReason = `dbus-send --print-reply --dest=org.gnome.SessionManager $inhibitor org.gnome.SessionManager.Inhibitor.GetReason`;
 
-			$names = explode("\n", $info);
-			$n = trim($names[1]);
-			if(substr($n, 0, 8) == 'string "')
-			{
-				$name = substr($n, 8, strlen($n) - 9);
+            $names = explode("\n", $AppId);
+            $reasons = explode("\n", $InhibitReason);
 
-				echo $inhibitor, " ", $name, "\n";
-			}
-		}
-	}
-	elseif($a == "array [")
-	{
-		$found = true;
-	}
+            $name = trim($names[1]);
+            $reason = trim($reasons[1]);
+
+            $name = substr($name, 8, strlen($name) - 9);
+            $reason = substr($reason, 8, strlen($reason) - 9);
+
+            echo $inhibitor, ", app=", $name, ", reason=", $reason, "\n";
+        }
+    }
+    elseif($a == "array [")
+    {
+        $foundResult = true;
+    }
 }
