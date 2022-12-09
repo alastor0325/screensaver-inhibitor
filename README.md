@@ -21,6 +21,6 @@ The script queries the D-Bus system for processes that are currently running and
 
 * How to run
 
-    1. Run `$ ./inhibitor`
+    1. Run `$ ./inhibitors`
     2. If there are active inhibitors, the script would show the requesters and the reason.
 
